@@ -1,7 +1,7 @@
-var mysql = require("mysql");
-var inquirer = require("inquirer");
+const mysql = require("mysql");
+const inquirer = require("inquirer");
 
-var connection = mysql.createConnection({
+const connection = mysql.createConnection({
   host: "localhost",
 
   port: 3306,
@@ -20,12 +20,12 @@ connection.connect(function(err) {
 
 function begin() {
   inquirer.prompt({
-          type: "checkbox",
+          type: "list",
           name: "options",
           message: "What would you like to do?",
           choices: [
             "View All Employees",
-            "Vice All Employees By Department",
+            "View All Employees By Department",
             "View All Employees by Manager",
             "Add Employee",
             "Remove Employee",
@@ -33,7 +33,8 @@ function begin() {
             "Update Employee Manager"
           ]
     }).then(function(answer) {
-            switch (answer) {
+      console.log(answer.options)
+            switch (answer.options) {
                 case "View All Employees":
                 allEmployees();
                 break;
@@ -62,22 +63,14 @@ function begin() {
                 updateManager();
                 break;
             }
-          }
-      )
-      // .catch(error => {
-      //   if(error.isTtyError) {
-      //     // Prompt couldn't be rendered in the current environment
-      //   } else {
-      //     // Something else when wrong
-      //   }
-}
+    });
+  }
 
-// function allEmployees()
-//     //console.log
+function allEmployees() {}
 
-// function byDepartment()
+function byDepartment() {}
 
-// function byManager()
+function byManager() {}
 
 function addEmployee() {
   inquirer.prompt ([
@@ -92,7 +85,7 @@ function addEmployee() {
         message: "What is the employee's last name?" 
       },
       {
-        type: "choices",
+        type: "list",
         name: "addEmployeeRole", 
         message: "What is the employee's role?", 
         choices: [
@@ -110,12 +103,11 @@ function addEmployee() {
         message: "Who is the employee's manager?" 
       }
     ]).then((answers) => {
-      console.log("Added employee", JSON.stringify(answers))
-      }
-    )
-
-    begin()
+      console.log("Added employee")
+      begin()}
+    ) 
 }
+
 
 function removeEmployee() {
   inquirer.prompt ([
@@ -124,37 +116,36 @@ function removeEmployee() {
         name: "remove",
         message: "Which employee would you like to remove?"
       }
-    ]).then(
-        console.log("Removed employee from the database")
+    ]).then((answers) => {
+      console.log("Removed employee")
+      begin()}
     )
-    begin()
 }
 
 function updateRole() {
   inquirer.prompt ([
       {
-        type: "choices",
-        name: "whichEmployee", 
-        message: "What is the employee's role?" 
+        type: "input",
+        name: "whichEmployee",
+        message: "Which employee would you like to update their role in the company?"
       },
       {
-        type: "choices",
+        type: "list",
         name: "updateEmployeeRole", 
         message: "What is the employee's role?", 
         choices: [
           "Sales Lead",
           "Salesperson",
           "Lead Engineer",
-          "software Engineer",
+          "Software Engineer",
           "Account Manager",
           "Accountant"
         ]
       }
-    ]).then(
-      console.log("Updated role")
-    )
-
-      begin()
+    ]).then((answers) => {
+      console.log("Updated employee's role")
+      begin()}
+    )  
 }     
 
 function updateManager() {
@@ -166,10 +157,11 @@ function updateManager() {
       },
       {
         type: "input",
-        name: "updateEmployeeManager", 
+        name: "updateSelectedEmployee", 
         message: "Which employee do you want to set as manager for the selected employee?" 
       }
-    ]).then(
+    ]).then((answers) => {
       console.log("Updated Employee's Manager")
-    );
+      begin()}
+    )
 }
