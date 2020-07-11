@@ -72,12 +72,12 @@ function begin() {
   }
 
 function allEmployees() {
-  // connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(m.first_name,' ', m.last_name) AS manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id LEFT JOIN employee m ON employee.manager_id = m.id;",
-  // (err, data) => {
-  //   if (err) throw err;
-  //   console.table(data);
-  //   begin();
-  // })
+  connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(m.first_name,' ', m.last_name) AS manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id LEFT JOIN employee m ON employee.manager_id = m.id;",
+  (err, data) => {
+    if (err) throw err;
+    console.table(data);
+    begin();
+  })
   begin()
 }
 
@@ -109,40 +109,40 @@ function addEmployee() {
         name: "addEmployeeLast", 
         message: "What is the employee's last name?" 
       },
-      {
-        type: "list",
-        name: "addEmployeeRole", 
-        message: "What is the employee's role?", 
-        choices: [
-          "Sales Lead",
-          "Salesperson",
-          "Lead Engineer",
-          "Software Engineer",
-          "Account Manager",
-          "Accountant"
-        ]
-      },
-      {
-        type: "input",
-        name: "addNewEmployeeManager", 
-        message: "Who is the employee's manager?" 
-      }
+      // {
+      //   type: "list",
+      //   name: "addEmployeeRole", 
+      //   message: "What is the employee's role?", 
+      //   choices: [
+      //     "Sales Lead",
+      //     "Salesperson",
+      //     "Lead Engineer",
+      //     "Software Engineer",
+      //     "Account Manager",
+      //     "Accountant"
+      //   ]
+      // },
+      // {
+      //   type: "input",
+      //   name: "addNewEmployeeManager", 
+      //   message: "Who is the employee's manager?" 
+      // }
     ]).then((answers) => {
       connection.query(
-        "INSERT INTO employee SET ?",
+        "SELECT  employee SET ? ",
         {
           first_name: answers.addEmployeeFirst,
           last_name: answers.addEmployeeLast,
-          role_id: answers.addEmployeeRole,
-          manager_id: answers.addNewEmployeeManager
+          // role_id: answers.role.title.addEmployeeRole,
+          // manager_id: answers.addNewEmployeeManager
         },
         function(err) {
           if (err) throw err;
           console.log("Added employee")
+          begin()
         }
-      )
-      begin()
-    })
+      );
+    });
 }
 
 function removeEmployee() {
