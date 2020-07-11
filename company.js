@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
 connection.connect(function(err) {
     if (err) throw err;
     begin();
-  });
+});
 
 
 function begin() {
@@ -30,7 +30,8 @@ function begin() {
             "Add Employee",
             "Remove Employee",
             "Update Employee Role",
-            "Update Employee Manager"
+            "Update Employee Manager",
+            "Exit"
           ]
     }).then(function(answer) {
       console.log(answer.options)
@@ -62,15 +63,39 @@ function begin() {
                 case "Update Employee Manager":
                 updateManager();
                 break;
+                
+                case "Exit":
+                exit();
+                break;
             }
     });
   }
 
-function allEmployees() {}
+function allEmployees() {
+  // connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(m.first_name,' ', m.last_name) AS manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id LEFT JOIN employee m ON employee.manager_id = m.id;",
+  // (err, data) => {
+  //   if (err) throw err;
+  //   console.table(data);
+  //   begin();
+  // })
+  begin()
+}
 
-function byDepartment() {}
+function byDepartment() {
+  connection.query("SELECT * FROM department", (err, data) => {
+    if (err) throw err;
+    console.table(data);
+    begin();
+    })
+  }
 
-function byManager() {}
+function byManager() {
+  connection.query("SELECT * FROM employee WHERE manager_id = ?", (err, data) => {
+    if (err) throw err;
+    console.table(data);
+    begin();
+    })
+}
 
 function addEmployee() {
   inquirer.prompt ([
@@ -92,7 +117,7 @@ function addEmployee() {
           "Sales Lead",
           "Salesperson",
           "Lead Engineer",
-          "software Engineer",
+          "Software Engineer",
           "Account Manager",
           "Accountant"
         ]
@@ -103,11 +128,22 @@ function addEmployee() {
         message: "Who is the employee's manager?" 
       }
     ]).then((answers) => {
-      console.log("Added employee")
-      begin()}
-    ) 
+      connection.query(
+        "INSERT INTO employee SET ?",
+        {
+          first_name: answers.addEmployeeFirst,
+          last_name: answers.addEmployeeLast,
+          role_id: answers.addEmployeeRole,
+          manager_id: answers.addNewEmployeeManager
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Added employee")
+        }
+      )
+      begin()
+    })
 }
-
 
 function removeEmployee() {
   inquirer.prompt ([
@@ -117,9 +153,16 @@ function removeEmployee() {
         message: "Which employee would you like to remove?"
       }
     ]).then((answers) => {
-      console.log("Removed employee")
-      begin()}
-    )
+      connection.query(
+        "DELETE FROM employee",
+        function(err) {
+          if (err) throw err;
+          console.log("Removed Employee");
+          start();
+        }
+      );
+      begin()
+    })
 }
 
 function updateRole() {
@@ -143,10 +186,21 @@ function updateRole() {
         ]
       }
     ]).then((answers) => {
-      console.log("Updated employee's role")
-      begin()}
-    )  
-}     
+      connection.query(
+        "UPDATE INTO role SET ?",
+        {
+          title: answers.whichEmployee,
+          role_id: answers.updateEmployeeRole,
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Added employee");
+          // re-prompt the user for if they want to bid or post
+        }
+      );
+      begin()
+    }) 
+}
 
 function updateManager() {
   inquirer.prompt ([
@@ -161,7 +215,22 @@ function updateManager() {
         message: "Which employee do you want to set as manager for the selected employee?" 
       }
     ]).then((answers) => {
-      console.log("Updated Employee's Manager")
-      begin()}
-    )
+      connection.query(
+        "UPDATE INTO employee SET ?",
+        {
+          title: answers.whichEmployee,
+          role_id: answers.updateEmployeeRole,
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Added employee");
+          // re-prompt the user for if they want to bid or post
+        }
+      );
+      begin()
+    })
 }
+
+function exit(){
+  connection.end();
+};
