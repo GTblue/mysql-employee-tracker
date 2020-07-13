@@ -78,7 +78,6 @@ function allEmployees() {
     console.table(data);
     begin();
   })
-  begin()
 }
 
 function byDepartment() {
@@ -101,41 +100,34 @@ function addEmployee() {
   inquirer.prompt ([
       {
         type: "input",
-        name: "addEmployeeFirst", 
+        name: "first_name", 
         message: "What is the employee's first name?" 
       },
       {
         type: "input",
-        name: "addEmployeeLast", 
+        name: "last_name", 
         message: "What is the employee's last name?" 
       },
-      // {
-      //   type: "list",
-      //   name: "addEmployeeRole", 
-      //   message: "What is the employee's role?", 
-      //   choices: [
-      //     "Sales Lead",
-      //     "Salesperson",
-      //     "Lead Engineer",
-      //     "Software Engineer",
-      //     "Account Manager",
-      //     "Accountant"
-      //   ]
-      // },
-      // {
-      //   type: "input",
-      //   name: "addNewEmployeeManager", 
-      //   message: "Who is the employee's manager?" 
-      // }
+      {
+        type: "input",
+        name: "role_id", 
+        message: "What is the id that corresponds to the employee's role?", 
+      },
+      {
+        type: "input",
+        name: "manager_id", 
+        message: "What was the id of the employee's manager?" 
+      }
     ]).then((answers) => {
+      console.log(answers)
       connection.query(
-        "SELECT  employee SET ? ",
-        {
-          first_name: answers.addEmployeeFirst,
-          last_name: answers.addEmployeeLast,
-          // role_id: answers.role.title.addEmployeeRole,
-          // manager_id: answers.addNewEmployeeManager
-        },
+        `INSERT INTO employee SET ?`, answers,
+        // {
+        //   first_name: answers.addEmployeeFirst,
+        //   last_name: answers.addEmployeeLast,
+        //   role_id: answers.role.title.addEmployeeRole,
+        //   manager_id: answers.addNewEmployeeManager
+        // },
         function(err) {
           if (err) throw err;
           console.log("Added employee")
@@ -149,16 +141,16 @@ function removeEmployee() {
   inquirer.prompt ([
       {
         type: "input",
-        name: "remove",
-        message: "Which employee would you like to remove?"
+        name: "id",
+        message: "Which employee id would you like to remove?"
       }
     ]).then((answers) => {
       connection.query(
-        "DELETE FROM employee",
+        "DELETE FROM employee WHERE id = ?",
+        answers,
         function(err) {
           if (err) throw err;
           console.log("Removed Employee");
-          start();
         }
       );
       begin()
@@ -218,12 +210,12 @@ function updateManager() {
       connection.query(
         "UPDATE INTO employee SET ?",
         {
-          title: answers.whichEmployee,
+          first_name: answers.whichEmployee,
           role_id: answers.updateEmployeeRole,
         },
         function(err) {
           if (err) throw err;
-          console.log("Added employee");
+          console.log("Updated manager");
           // re-prompt the user for if they want to bid or post
         }
       );
